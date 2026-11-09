@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Maison Noor | Original Perfumes</title>
+<meta name="description" content="Original designer and niche fragrances with Cash on Delivery nationwide.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+<!-- Tailwind Play CDN: fine for launch/testing. For heavy traffic, compile with the Tailwind CLI. -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  /* Design tokens. Change colours/fonts here and they update everywhere. */
+  tailwind.config = { theme: { extend: {
+    colors: { ink: "#0E0D0B", smoke: "#1B1915", bone: "#F6F3EC", bone2: "#ECE7DC", brass: "#B08D57", silver: "#A8ABAF" },
+    fontFamily: { display: ["Cormorant Garamond", "Georgia", "serif"], sans: ["Inter", "system-ui", "sans-serif"] }
+  } } };
+</script>
+<style>
+  /* Drawers/modals open when JS sets data-open="true" (see app.js → UI) */
+  [data-panel]{transition:transform .3s ease,opacity .3s ease}
+  #cartDrawer{transform:translateX(100%)} #cartDrawer[data-open]{transform:none}
+  #menuDrawer{transform:translateX(-100%)} #menuDrawer[data-open]{transform:none}
+  #searchBar{transform:translateY(-100%)} #searchBar[data-open]{transform:none}
+  #qvModal{opacity:0;pointer-events:none} #qvModal[data-open]{opacity:1;pointer-events:auto}
+  #overlay{opacity:0;pointer-events:none;transition:opacity .3s} #overlay[data-open]{opacity:1;pointer-events:auto}
+  [data-filter-cat][aria-pressed="true"]{color:#B08D57}
+  :focus-visible{outline:2px solid #B08D57;outline-offset:2px}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body class="bg-bone font-sans text-ink antialiased" style="padding-bottom:env(safe-area-inset-bottom)">
+
+<!-- ===== STICKY HEADER (announcement bar + nav) ===== -->
+<div class="sticky top-0 z-30" style="padding-top:env(safe-area-inset-top);background:#0E0D0B">
+  <p id="announce" class="bg-brass px-4 py-2 text-center text-xs text-ink"></p>
+  <header class="flex items-center gap-4 bg-ink px-4 py-4 text-bone md:px-8">
+    <button class="md:hidden" data-open-panel="menu" aria-label="Open menu">
+      <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M3 7h18M3 12h18M3 17h18"/></svg></button>
+    <a href="#top" class="font-display text-2xl font-semibold tracking-wide md:text-3xl" data-store-name></a>
+    <nav id="navDesktop" class="ml-8 hidden gap-7 text-sm md:flex" aria-label="Main"></nav>
+    <div class="ml-auto flex items-center gap-5">
+      <button data-open-panel="search" aria-label="Search"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="10" cy="10" r="7"/><path d="m15 15 5 5"/></svg></button>
+      <button class="relative" data-open-panel="cart" aria-label="Open cart"><svg width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M4 7h14l-1 12H5L4 7Zm4 0a3 3 0 0 1 6 0"/></svg>
+        <span data-cart-count hidden class="absolute -right-2 -top-2 grid h-4 min-w-4 place-items-center rounded-full bg-brass px-1 text-[10px] text-ink">0</span></button>
+    </div>
+  </header>
+  <!-- Search bar (slides down) -->
+  <div id="searchBar" data-panel class="absolute inset-x-0 top-full z-40 bg-bone p-4 shadow-xl md:px-8">
+    <form id="searchForm" class="mx-auto flex max-w-2xl gap-3"><input id="searchInput" type="search" placeholder="Search by fragrance or brand" class="w-full border-b border-ink bg-transparent py-2 outline-none" aria-label="Search"><button class="text-sm">Search</button></form>
+  </div>
+</div>
+<div id="top"></div>
+
+<!-- ===== HERO ===== -->
+<section class="bg-ink text-bone">
+  <div class="mx-auto grid min-h-[78vh] max-w-7xl items-center gap-10 px-6 py-16 md:grid-cols-12 md:px-8">
+    <div class="md:col-span-7">
+      <h1 class="font-display text-6xl font-semibold leading-[0.95] sm:text-7xl lg:text-8xl">Scent is the last thing<br>you put on, and the first<br>thing remembered.</h1>
+      <p class="mt-6 max-w-md text-bone/70">Original designer and niche fragrances, delivered to your door across Pakistan.</p>
+      <div class="mt-8 flex flex-wrap gap-4">
+        <a href="#shop" class="bg-brass px-8 py-3.5 text-ink transition hover:bg-bone">Explore Luxury Scents</a>
+        <a href="#collections" class="border border-bone/30 px-8 py-3.5 transition hover:border-brass hover:text-brass">View collections</a></div>
+    </div>
+    <!-- Replace this block with your hero image: <img src="images/hero.jpg" class="h-full w-full object-cover"> -->
+    <div class="relative hidden aspect-[3/4] md:col-span-5 md:block">
+      <div class="absolute inset-0 border border-brass/60"></div><div class="absolute inset-4 bg-smoke"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ===== TRUST BADGES ===== -->
+<section class="border-b border-ink/10 bg-bone2">
+  <ul class="mx-auto grid max-w-7xl grid-cols-2 gap-6 px-6 py-8 text-sm md:grid-cols-4 md:px-8">
+    <li class="flex items-center gap-3"><svg class="shrink-0 text-brass" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15 3 5 7v7c0 6 4 10 10 13 6-3 10-7 10-13V7L15 3Zm-4 12 3 3 6-6"/></svg><span><b class="block">100% Original</b>Authorized distributors</span></li>
+    <li class="flex items-center gap-3"><svg class="shrink-0 text-brass" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2 8h17v13H2V8Zm17 4h5l4 4v5h-9M8 24a2 2 0 1 0 0-.1M22 24a2 2 0 1 0 0-.1"/></svg><span><b class="block">Nationwide COD</b>Pay when it arrives</span></li>
+    <li class="flex items-center gap-3"><svg class="shrink-0 text-brass" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="5" y="13" width="20" height="14" rx="2"/><path d="M10 13V9a5 5 0 0 1 10 0v4"/></svg><span><b class="block">Secure Checkout</b>Your details stay private</span></li>
+    <li class="flex items-center gap-3"><svg class="shrink-0 text-brass" width="30" height="30" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="4" y="11" width="22" height="15"/><path d="M4 16h22M15 11v15M15 11c-4 0-6-5-2-5s2 5 2 5Zm0 0c4 0 6-5 2-5s-2 5-2 5Z"/></svg><span><b class="block" id="shipPromo"></b>Gift-ready packaging</span></li>
+  </ul>
+</section>
+
+<!-- ===== PRODUCT GRID (dynamic; filled from js/products.js) ===== -->
+<section id="shop" class="mx-auto max-w-7xl px-6 py-20 md:px-8" style="scroll-margin-top:7rem">
+  <div class="flex flex-wrap items-end justify-between gap-4">
+    <div><h2 id="gridTitle" class="font-display text-4xl md:text-5xl">Our fragrances</h2><p id="resultCount" class="mt-1 text-sm text-ink/60"></p></div>
+    <label class="text-sm">Sort
+      <select id="sort" class="ml-2 border border-ink/20 bg-transparent px-3 py-2">
+        <option value="featured">Featured</option><option value="pl">Price, low to high</option><option value="ph">Price, high to low</option><option value="az">A to Z</option></select></label>
+  </div>
+  <div id="grid" class="mt-10 grid grid-cols-2 gap-x-4 gap-y-10 md:grid-cols-3 lg:grid-cols-4 lg:gap-x-6"></div>
+  <!-- Empty state: shown while no products match -->
+  <div id="empty" hidden class="mt-10 border border-dashed border-ink/25 px-6 py-20 text-center">
+    <p id="emptyText" class="mx-auto max-w-md text-ink/70"></p>
+    <button id="clearFilters" class="mt-5 text-sm underline">Clear filters</button></div>
+</section>
+
+<!-- ===== SPLIT-SCREEN PROMO (edit in js/config.js → promos) ===== -->
+<section id="collections" class="grid md:grid-cols-2"><div id="promos" class="contents"></div></section>
+
+<!-- ===== FOOTER ===== -->
+<footer class="bg-ink text-bone" style="padding-bottom:env(safe-area-inset-bottom)">
+  <div class="mx-auto grid max-w-7xl gap-12 px-6 py-16 md:grid-cols-12 md:px-8">
+    <div class="md:col-span-4"><p class="font-display text-3xl" data-store-name></p><p class="mt-3 max-w-xs text-sm text-bone/60">Original fragrances, honestly priced and delivered with care.</p>
+      <div id="socials" class="mt-5 flex gap-4 text-sm"></div></div>
+    <div class="md:col-span-2"><p class="mb-3 text-brass">Shop</p><div id="footCats" class="text-sm"></div></div>
+    <div class="md:col-span-2"><p class="mb-3 text-brass">Help</p><ul class="space-y-2 text-sm text-bone/70"><li>Shipping and delivery</li><li>Returns</li><li>Authenticity</li><li>Contact</li></ul></div>
+    <div class="md:col-span-4"><p class="mb-3 text-brass">Contact</p><ul id="contactInfo" class="space-y-2 text-sm text-bone/70"></ul>
+      <form id="newsletter" class="mt-6 flex border-b border-bone/40"><input name="email" type="email" required placeholder="Email for new arrivals" class="w-full bg-transparent py-2 text-sm outline-none" aria-label="Email"><button class="text-sm text-brass">Subscribe</button></form><p id="nlMsg" class="mt-2 text-xs text-brass" aria-live="polite"></p></div>
+  </div>
+  <p class="border-t border-bone/10 py-5 text-center text-xs text-bone/50">© <span id="year"></span> <span data-store-name></span>. All rights reserved.</p>
+</footer>
+
+<!-- ===== OVERLAY ===== -->
+<div id="overlay" class="fixed inset-0 z-40 bg-ink/60"></div>
+
+<!-- ===== MOBILE MENU DRAWER ===== -->
+<aside id="menuDrawer" data-panel class="fixed inset-y-0 left-0 z-50 w-[85%] max-w-sm overflow-auto bg-ink p-6 text-bone" style="padding-top:calc(1.5rem + env(safe-area-inset-top))" aria-label="Menu">
+  <div class="mb-6 flex items-center justify-between"><span class="font-display text-2xl" data-store-name></span><button data-close aria-label="Close menu" class="text-2xl">×</button></div>
+  <nav id="navMobile"></nav>
+</aside>
+
+<!-- ===== CART DRAWER ===== -->
+<aside id="cartDrawer" data-panel class="fixed inset-y-0 right-0 z-50 flex w-full max-w-md flex-col bg-ink p-6 text-bone" style="padding-top:calc(1.5rem + env(safe-area-inset-top));padding-bottom:calc(1.5rem + env(safe-area-inset-bottom))" aria-label="Cart">
+  <div class="flex items-center justify-between"><h2 class="font-display text-3xl">Your cart</h2><button data-close aria-label="Close cart" class="text-2xl">×</button></div>
+  <ul id="cartItems" class="mt-4 flex-1 overflow-auto"></ul>
+  <div id="cartFoot" hidden>
+    <p id="shipNote" class="text-xs text-bone/70"></p><div class="my-2 h-1 bg-bone/15"><div id="shipBar" class="h-full bg-brass"></div></div>
+    <p class="flex justify-between py-2"><span>Total</span><b id="cartTotal"></b></p>
+    <form id="checkoutForm" class="space-y-2 text-sm">
+      <input name="name" required placeholder="Full name" class="w-full border border-bone/20 bg-transparent p-2.5">
+      <input name="phone" required inputmode="tel" placeholder="Phone number" class="w-full border border-bone/20 bg-transparent p-2.5">
+      <input name="city" required placeholder="City" class="w-full border border-bone/20 bg-transparent p-2.5">
+      <textarea name="address" required rows="2" placeholder="Full address" class="w-full border border-bone/20 bg-transparent p-2.5"></textarea>
+      <button class="w-full bg-brass py-3.5 text-ink hover:bg-bone">Place order (Cash on Delivery)</button></form>
+  </div>
+</aside>
+
+<!-- ===== QUICK VIEW MODAL ===== -->
+<div id="qvModal" data-panel class="fixed inset-0 z-50 grid place-items-center p-4">
+  <div class="relative max-h-[90vh] w-full max-w-3xl overflow-auto bg-bone"><button data-close aria-label="Close" class="absolute right-3 top-2 z-10 text-3xl">×</button>
+    <div id="qvBody" class="grid md:grid-cols-2"></div></div>
+</div>
+
+<!-- Load order matters: config → products → app -->
+<script>
+/* ===== config.js (inlined) ===== */
+/* ==========================================================================
+   config.js — STORE SETTINGS. Edit this file to rebrand; no other file needs
+   to change for text, contact details, categories or currency.
+   ========================================================================== */
+window.STORE = {
+  name: "Maison Noor",                       // Brand name (header, footer, cart)
+  announcement: "Cash on Delivery Nationwide  |  100% Original Fragrances",
+  currency: "Rs.",                           // Shown before every price
+  freeShippingAbove: 8000,                   // Free delivery threshold
+  shippingFee: 250,                          // Flat fee below the threshold
+  whatsapp: "923267434516",                  // Orders are sent here (country code, no + or spaces)
+  phone: "+92 300 0000000",
+  email: "hello@yourstore.pk",
+  address: "Your street, City, Pakistan",
+  social: { instagram: "#", facebook: "#", tiktok: "#", youtube: "#" },
+
+  /* Navigation + filter categories. `slug` must match product.category. */
+  categories: [
+    { slug: "men",       label: "Men" },
+    { slug: "women",     label: "Women" },
+    { slug: "unisex",    label: "Unisex" },
+    { slug: "niche",     label: "Niche" },
+    { slug: "gift-sets", label: "Gift Sets" }
+  ],
+
+  /* Split-screen promo banners on the homepage. Set `category` to filter. */
+  promos: [
+    { title: "For Him",  text: "Woods, spice and amber for every occasion.", category: "men" },
+    { title: "For Her",  text: "Florals, vanilla and soft musks.",           category: "women" }
+  ]
+};
+
+</script>
+<script>
+/* ===== products.js (inlined) ===== */
+/* ==========================================================================
+   products.js — YOUR PRODUCT CATALOG. Intentionally empty.
+   Add one object per product to the array below. Save and refresh.
+
+   {
+     id: "unique-id",                 // required, unique, no spaces
+     name: "Product name",            // required
+     brand: "Brand",                  // required (feeds the Brands menu)
+     category: "men",                 // men | women | unisex | niche | gift-sets
+     price: 12500,                    // required, number
+     comparePrice: 15000,             // optional, old price (shows discount badge)
+     image: "images/product-1.jpg",   // main image (path or full URL)
+     imageHover: "images/product-1b.jpg", // optional, shown on hover
+     size: "100ml",                   // optional
+     notes: "Bergamot, Oud, Amber",   // optional short scent notes
+     description: "Longer text…",     // optional, shown in Quick View
+     inStock: true,                   // false => "Sold out"
+     featured: true                   // true => shown in the homepage grid
+   }
+
+   To load from an API instead, replace the array with a fetch() in app.js
+   (see loadProducts()).
+   ========================================================================== */
+window.PRODUCTS = [{
+  id: "p1",
+  name: "Roma",
+  //brand: "Brand",
+  category: "men",
+  price: 500,
+  image: "https://th.bing.com/th/id/OIP.JGgEnLLdQMuooP-WORKpoAHaHa?w=160&h=108&c=7&qlt=90&bgcl=161495&r=0&o=6&pid=13.1",
+  inStock: instock = true,
+  featured: true
+},
+  // Add your products here.
+];
+
+</script>
+<script>
+/* ===== app.js (inlined) ===== */
+/* ==========================================================================
+   app.js — storefront logic, split into small modules:
+   Utils → Cart → Catalog (filter/search/render) → QuickView → UI (drawers)
+   Data comes from window.STORE (config.js) and window.PRODUCTS (products.js).
+   ========================================================================== */
+(() => {
+  "use strict";
+  const S = window.STORE;
+  const $ = (s, r = document) => r.querySelector(s);
+  const $$ = (s, r = document) => [...r.querySelectorAll(s)];
+
+  /* ---------- Utils ---------- */
+  const Utils = {
+    money: n => `${S.currency} ${Number(n).toLocaleString("en-PK")}`,
+    esc: s => String(s ?? "").replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])),
+    discount: p => (p.comparePrice > p.price ? Math.round((1 - p.price / p.comparePrice) * 100) : 0)
+  };
+
+  /* ---------- Data loading (swap for fetch('/api/products') later) ---------- */
+  let PRODUCTS = [];
+  async function loadProducts() { PRODUCTS = window.PRODUCTS || []; }
+  const byId = id => PRODUCTS.find(p => p.id === id);
+
+  /* ---------- Cart (persists in localStorage) ---------- */
+  const Cart = {
+    items: {},
+    load() { try { this.items = JSON.parse(localStorage.getItem("cart") || "{}"); } catch { this.items = {}; } },
+    save() { try { localStorage.setItem("cart", JSON.stringify(this.items)); } catch {} Cart.render(); },
+    add(id) { if (byId(id)?.inStock !== false) { this.items[id] = (this.items[id] || 0) + 1; this.save(); UI.open("cart"); } },
+    change(id, d) { this.items[id] = (this.items[id] || 0) + d; if (this.items[id] <= 0) delete this.items[id]; this.save(); },
+    lines() { return Object.entries(this.items).map(([id, q]) => ({ p: byId(id), q })).filter(l => l.p); },
+    subtotal() { return this.lines().reduce((s, l) => s + l.p.price * l.q, 0); },
+    count() { return this.lines().reduce((s, l) => s + l.q, 0); },
+    render() {
+      const lines = this.lines(), sub = this.subtotal(), ship = sub >= S.freeShippingAbove || !lines.length ? 0 : S.shippingFee;
+      $$("[data-cart-count]").forEach(e => { e.textContent = this.count(); e.hidden = !this.count(); });
+      $("#cartItems").innerHTML = lines.length ? lines.map(({ p, q }) => `
+        <li class="flex gap-3 py-4 border-b border-bone/10">
+          <div class="h-20 w-16 shrink-0 bg-smoke grid place-items-center overflow-hidden">${p.image ? `<img src="${Utils.esc(p.image)}" alt="" class="h-full w-full object-cover">` : ""}</div>
+          <div class="flex-1 text-sm"><p class="text-brass text-xs">${Utils.esc(p.brand)}</p><p>${Utils.esc(p.name)}</p><p class="mt-1">${Utils.money(p.price)}</p>
+            <div class="mt-2 inline-flex items-center border border-bone/20">
+              <button class="px-3 py-1" data-dec="${Utils.esc(p.id)}" aria-label="Decrease">−</button><span class="px-2">${q}</span>
+              <button class="px-3 py-1" data-inc="${Utils.esc(p.id)}" aria-label="Increase">+</button></div></div></li>`).join("")
+        : `<li class="py-16 text-center text-bone/60">Your cart is empty.<br><a href="#shop" data-close class="underline text-brass">Browse fragrances</a></li>`;
+      const left = S.freeShippingAbove - sub;
+      $("#cartFoot").hidden = !lines.length;
+      $("#shipNote").textContent = left > 0 ? `Add ${Utils.money(left)} more for free delivery` : "Free delivery unlocked";
+      $("#shipBar").style.width = Math.min(100, sub / S.freeShippingAbove * 100) + "%";
+      $("#cartTotal").textContent = Utils.money(sub + ship);
+    },
+    checkout(e) {
+      e.preventDefault();
+      const f = new FormData(e.target), lines = this.lines(), sub = this.subtotal(), ship = sub >= S.freeShippingAbove ? 0 : S.shippingFee;
+      const msg = `New order (Cash on Delivery)\n${lines.map(l => `${l.q} x ${l.p.name} - ${Utils.money(l.p.price * l.q)}`).join("\n")}\nDelivery: ${Utils.money(ship)}\nTotal: ${Utils.money(sub + ship)}\n\nName: ${f.get("name")}\nPhone: ${f.get("phone")}\nCity: ${f.get("city")}\nAddress: ${f.get("address")}`;
+      /* HOOK: replace this line with your own backend / Shopify / payment call. */
+      window.open(`https://wa.me/${S.whatsapp}?text=${encodeURIComponent(msg)}`, "_blank", "noopener");
+      this.items = {}; this.save(); e.target.reset(); UI.close();
+    }
+  };
+
+  /* ---------- Catalog: filter, search, render ---------- */
+  const Catalog = {
+    state: { category: "", brand: "", q: "", sort: "featured" },
+    card(p) {
+      const d = Utils.discount(p), id = Utils.esc(p.id);
+      return `<article class="group">
+        <div class="relative aspect-[4/5] overflow-hidden bg-bone2">
+          ${p.image ? `<img src="${Utils.esc(p.image)}" alt="${Utils.esc(p.name)}" loading="lazy" class="absolute inset-0 h-full w-full object-cover transition duration-500 ${p.imageHover ? "group-hover:opacity-0" : "group-hover:scale-105"}">` : ""}
+          ${p.imageHover ? `<img src="${Utils.esc(p.imageHover)}" alt="" loading="lazy" class="absolute inset-0 h-full w-full object-cover opacity-0 transition duration-500 group-hover:opacity-100">` : ""}
+          ${p.inStock === false ? `<span class="absolute left-3 top-3 bg-ink px-2 py-1 text-xs text-bone">Sold out</span>` : d ? `<span class="absolute left-3 top-3 bg-brass px-2 py-1 text-xs text-ink">−${d}%</span>` : ""}
+          <div class="absolute inset-x-0 bottom-0 flex translate-y-full gap-px transition group-hover:translate-y-0 focus-within:translate-y-0 max-md:translate-y-0">
+            <button class="flex-1 bg-ink/95 py-3 text-sm text-bone hover:bg-brass hover:text-ink" data-quick="${id}">Quick view</button>
+            <button class="flex-1 bg-brass py-3 text-sm text-ink disabled:opacity-40" data-add="${id}" ${p.inStock === false ? "disabled" : ""}>Add to cart</button></div></div>
+        <p class="mt-3 text-xs text-ink/60">${Utils.esc(p.brand)}</p>
+        <h3 class="font-medium leading-snug">${Utils.esc(p.name)}</h3>
+        <p class="mt-1"><span class="font-medium">${Utils.money(p.price)}</span>${d ? ` <s class="ml-1 text-sm text-ink/50">${Utils.money(p.comparePrice)}</s>` : ""}</p></article>`;
+    },
+    visible() {
+      const { category, brand, q, sort } = this.state;
+      let r = PRODUCTS.filter(p => (!category || p.category === category) && (!brand || p.brand === brand) && (p.name + " " + p.brand).toLowerCase().includes(q.toLowerCase()));
+      const sorts = { pl: (a, b) => a.price - b.price, ph: (a, b) => b.price - a.price, az: (a, b) => a.name.localeCompare(b.name) };
+      if (sorts[sort]) r.sort(sorts[sort]); else r.sort((a, b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0));
+      return r;
+    },
+    render() {
+      const r = this.visible(), grid = $("#grid"), empty = $("#empty");
+      grid.innerHTML = r.map(p => this.card(p)).join("");
+      empty.hidden = r.length > 0;
+      $("#emptyText").textContent = PRODUCTS.length ? "No fragrances match your filters." : "Your catalog is empty. Open js/products.js and add your first product.";
+      const cat = S.categories.find(c => c.slug === this.state.category);
+      $("#gridTitle").textContent = this.state.brand || cat?.label || "Our fragrances";
+      $("#resultCount").textContent = `${r.length} ${r.length === 1 ? "product" : "products"}`;
+      $$("[data-filter-cat]").forEach(b => b.setAttribute("aria-pressed", b.dataset.filterCat === this.state.category));
+    },
+    set(patch, scroll = true) { Object.assign(this.state, patch); this.render(); if (scroll) $("#shop").scrollIntoView({ behavior: "smooth" }); }
+  };
+
+  /* ---------- Quick view ---------- */
+  const QuickView = {
+    open(id) {
+      const p = byId(id); if (!p) return;
+      $("#qvBody").innerHTML = `
+        <div class="aspect-[4/5] bg-bone2">${p.image ? `<img src="${Utils.esc(p.image)}" alt="" class="h-full w-full object-cover">` : ""}</div>
+        <div class="p-6 md:p-8 flex flex-col"><p class="text-xs text-brass">${Utils.esc(p.brand)}</p>
+          <h2 class="font-display text-3xl">${Utils.esc(p.name)}</h2>
+          <p class="mt-2 text-lg">${Utils.money(p.price)}${Utils.discount(p) ? ` <s class="text-sm text-ink/50">${Utils.money(p.comparePrice)}</s>` : ""}</p>
+          ${p.size ? `<p class="mt-2 text-sm text-ink/60">${Utils.esc(p.size)}</p>` : ""}
+          ${p.notes ? `<p class="mt-4 text-sm"><b>Notes:</b> ${Utils.esc(p.notes)}</p>` : ""}
+          ${p.description ? `<p class="mt-3 text-sm leading-relaxed text-ink/80">${Utils.esc(p.description)}</p>` : ""}
+          <button class="mt-auto w-full bg-ink py-3 text-bone hover:bg-brass hover:text-ink disabled:opacity-40" data-add="${Utils.esc(p.id)}" ${p.inStock === false ? "disabled" : ""}>${p.inStock === false ? "Sold out" : "Add to cart"}</button></div>`;
+      UI.open("qv");
+    }
+  };
+
+  /* ---------- UI: drawers, modals, menus ---------- */
+  const UI = {
+    panels: { cart: "#cartDrawer", menu: "#menuDrawer", search: "#searchBar", qv: "#qvModal" },
+    open(k) { this.close(); $(this.panels[k]).dataset.open = "true"; $("#overlay").dataset.open = "true"; document.body.classList.add("overflow-hidden"); if (k === "search") $("#searchInput").focus(); },
+    close() { $$("[data-open]").forEach(e => delete e.dataset.open); document.body.classList.remove("overflow-hidden"); }
+  };
+
+  /* ---------- Build nav + footer from config ---------- */
+  function buildChrome() {
+    document.title = `${S.name} | Original Perfumes`;
+    $$("[data-store-name]").forEach(e => e.textContent = S.name);
+    $("#announce").textContent = S.announcement;
+    const brands = [...new Set(PRODUCTS.map(p => p.brand).filter(Boolean))].sort();
+    const catLinks = cls => S.categories.map(c => `<button class="${cls}" data-filter-cat="${c.slug}">${Utils.esc(c.label)}</button>`).join("");
+    $("#navDesktop").innerHTML = catLinks("hover:text-brass aria-pressed:text-brass") +
+      `<div class="relative group"><button class="hover:text-brass">Brands</button><div class="invisible absolute left-0 top-full z-30 w-56 max-h-80 overflow-auto bg-ink p-3 opacity-0 shadow-xl group-hover:visible group-hover:opacity-100 group-focus-within:visible group-focus-within:opacity-100">${brands.length ? brands.map(b => `<button class="block w-full py-1.5 text-left text-sm hover:text-brass" data-filter-brand="${Utils.esc(b)}">${Utils.esc(b)}</button>`).join("") : `<p class="text-sm text-bone/50">Brands appear once you add products.</p>`}</div></div>`;
+    $("#navMobile").innerHTML = catLinks("block w-full py-3 text-left font-display text-2xl border-b border-bone/10") +
+      `<p class="pt-5 text-xs text-brass">Brands</p>` + (brands.map(b => `<button class="block w-full py-2 text-left text-bone/80" data-filter-brand="${Utils.esc(b)}">${Utils.esc(b)}</button>`).join("") || `<p class="text-sm text-bone/40">None yet</p>`);
+    $("#promos").innerHTML = S.promos.map(p => `<button data-filter-cat="${p.category}" class="group relative flex min-h-[26rem] items-end p-8 text-left md:p-12 ${p.category === S.promos[0].category ? "bg-ink text-bone" : "bg-smoke text-bone"}">
+      <span><span class="block font-display text-5xl md:text-6xl">${Utils.esc(p.title)}</span><span class="mt-3 block max-w-xs text-bone/70">${Utils.esc(p.text)}</span><span class="mt-5 inline-block border-b border-brass pb-1 text-brass">Shop the collection</span></span></button>`).join("");
+    $("#footCats").innerHTML = catLinks("block py-1 text-bone/70 hover:text-brass");
+    $("#contactInfo").innerHTML = `<li>${Utils.esc(S.phone)}</li><li>${Utils.esc(S.email)}</li><li>${Utils.esc(S.address)}</li>`;
+    $("#socials").innerHTML = Object.entries(S.social).map(([n, u]) => `<a href="${Utils.esc(u)}" class="capitalize text-bone/70 hover:text-brass" target="_blank" rel="noopener">${n}</a>`).join("");
+    $("#shipPromo").textContent = `Free delivery on orders above ${Utils.money(S.freeShippingAbove)}`;
+  }
+
+  /* ---------- Events (one delegated listener) ---------- */
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-add],[data-quick],[data-inc],[data-dec],[data-open-panel],[data-close],[data-filter-cat],[data-filter-brand],#overlay");
+    if (!t) return;
+    const d = t.dataset;
+    if (d.add) Cart.add(d.add);
+    else if (d.quick) QuickView.open(d.quick);
+    else if (d.inc) Cart.change(d.inc, 1);
+    else if (d.dec) Cart.change(d.dec, -1);
+    else if (d.openPanel) UI.open(d.openPanel);
+    else if (d.filterCat !== undefined) { UI.close(); Catalog.set({ category: d.filterCat, brand: "" }); }
+    else if (d.filterBrand) { UI.close(); Catalog.set({ brand: d.filterBrand, category: "" }); }
+    else UI.close();
+  });
+  document.addEventListener("keydown", e => e.key === "Escape" && UI.close());
+
+  /* ---------- Init ---------- */
+  document.addEventListener("DOMContentLoaded", async () => {
+    await loadProducts(); Cart.load(); buildChrome(); Catalog.render(); Cart.render();
+    $("#searchInput").addEventListener("input", e => Catalog.set({ q: e.target.value }, false));
+    $("#searchForm").addEventListener("submit", e => { e.preventDefault(); UI.close(); $("#shop").scrollIntoView({ behavior: "smooth" }); });
+    $("#sort").addEventListener("change", e => Catalog.set({ sort: e.target.value }, false));
+    $("#clearFilters").addEventListener("click", () => { $("#searchInput").value = ""; Catalog.set({ category: "", brand: "", q: "" }, false); });
+    $("#checkoutForm").addEventListener("submit", e => Cart.checkout(e));
+    $("#newsletter").addEventListener("submit", e => { e.preventDefault(); /* HOOK: send e.target.email.value to your mailing service */ $("#nlMsg").textContent = "Thank you. You are subscribed."; e.target.reset(); });
+    $("#year").textContent = new Date().getFullYear();
+  });
+})();
+
+</script>
+</body>
+</html>
